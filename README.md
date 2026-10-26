@@ -1,4 +1,5 @@
-# Terra Ledger — Blockchain Land Registry
+# Blockchain-Based Property Ownership and Land Record Management System
+
 
 An academic demonstration of property record registration and ownership transfers on a local Ethereum-compatible chain. The repository includes the Solidity contract, Hardhat local development and tests, a React/Vite dashboard, MetaMask support, and client-side encrypted document upload.
 
@@ -27,12 +28,19 @@ An academic demonstration of property record registration and ownership transfer
 contracts/LandRegistry.sol      Registry and escrow contract
 scripts/deploy.js               Local deployment and frontend ABI export
 scripts/seed.js                 Optional fictional sample records
+scripts/wait-for-chain.ps1      RPC readiness check for the Windows launcher
+scripts/capture-screenshots.js  Captures the main UI routes with Chrome or Edge
 test/LandRegistry.test.js       Contract authorization, registry, and escrow tests
-frontend/src/App.jsx             Responsive dashboard and workflows
+screenshots/                    Generated dashboard screenshots
+frontend/src/App.jsx             Wallet state and route shell
+frontend/src/components/         Shared registry tables, cards, and transfer UI
+frontend/src/pages/              Overview, records, registration, transfers, administration
 frontend/src/services/           Wallet, contract, and encrypted-document utilities
+frontend/src/utils/              Date, address, number, and status formatting
 frontend/src/styles.css          Responsive visual system
 frontend/src/contract.json       Frontend contract address and ABI; refreshed on deployment
 hardhat.config.js                Local Hardhat network configuration
+start.bat                        Windows one-click local demo launcher
 ```
 
 ## Requirements and install
@@ -51,6 +59,18 @@ npm --prefix frontend install
 Copy `.env.example` to `frontend/.env.local` for frontend settings. The default RPC is `http://127.0.0.1:8545`; no private key or API credential is required for local development. Never commit `.env` files, private keys, wallet secrets, or API credentials.
 
 ## Run locally
+
+### Windows one-click startup
+
+Double-click `start.bat` from File Explorer. It installs dependencies if needed, starts or reuses the local Hardhat node, compiles and deploys the registry, seeds three fictional parcels, starts Vite, and opens `http://localhost:5173`. Keep both opened terminal windows running while using the demo. It never deploys to a public network.
+
+The script may reuse a Hardhat node that is already running. Restarting the node resets its blockchain state; run the launcher again to deploy and seed a fresh local demo.
+
+### Capture UI screenshots
+
+Start the local chain and frontend, deploy/seed demo data, then run `npm run capture:screenshots` from the repository root. The script uses an installed Chrome or Edge and saves four route screenshots under `screenshots/`. If the browser is installed outside the usual Windows locations, set `CHROME_PATH` to its executable path first.
+
+### Manual startup
 
 Open separate terminals from the repository root.
 
@@ -131,4 +151,4 @@ Public-network deployment is not configured or run by default. If you explicitly
 
 ## Tests
 
-`npm test` covers deployer/registrar access control, unique survey numbers, land lookup and ownership history, exact buyer payments, approvals, cancellation/refund, and transfer reuse protection. Frontend production bundle validation is `npm run build`.
+`npm test` runs 20 focused cases covering administrator/registrar access, registration validation and lookup, owner indexes, exact buyer payments, approvals, cancellation/refunds, and replay/withdrawal protection. Frontend production bundle validation is `npm run build`.

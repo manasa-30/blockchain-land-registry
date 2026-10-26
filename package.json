@@ -10,7 +10,9 @@
     "chain": "hardhat node",
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy:local": "hardhat run scripts/deploy.js --network localhost"
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "seed:local": "hardhat run scripts/seed.js --network localhost",
+    "capture:screenshots": "node scripts/capture-screenshots.js"
   },
   "devDependencies": { "hardhat": "^2.22.17", "@nomicfoundation/hardhat-toolbox": "^5.0.0", "solc": "^0.8.26" }
 }
