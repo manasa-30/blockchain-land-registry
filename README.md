@@ -145,16 +145,6 @@ Without an IPFS endpoint, encrypted documents are kept in the current browser's 
 
 Never put a Pinata JWT or provider secret in a Vite environment variable because frontend variables are public. For hosted Pinata use, route uploads through a secured backend proxy.
 
-## Capture screenshots
-
-With the local chain and frontend running (and demo data seeded), run:
-
-```bash
-npm run capture:screenshots
-```
-
-The script uses an installed Chrome or Edge and writes captures of the overview, land records, transfer portal, and registration portal into `screenshots/`. Set `CHROME_PATH` if the browser executable is outside the usual Windows install locations.
-
 ## Tests and build
 
 ```bash
