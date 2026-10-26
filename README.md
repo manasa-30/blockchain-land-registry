@@ -1,154 +1,170 @@
 # Blockchain-Based Property Ownership and Land Record Management System
 
+A local Ethereum-compatible application for registering land parcels, verifying recorded ownership, viewing ownership history, and handling property transfers with escrow. It is an academic demonstration and uses fictional data on a local Hardhat network.
 
-An academic demonstration of property record registration and ownership transfers on a local Ethereum-compatible chain. The repository includes the Solidity contract, Hardhat local development and tests, a React/Vite dashboard, MetaMask support, and client-side encrypted document upload.
-
-> **Demonstration only.** An on-chain record does not by itself establish legal property ownership. Real deployment requires government integration, legal authorization, verified source documents, privacy safeguards, and compliance with applicable laws. Use fictional data and Hardhat test ETH only.
+> **Academic prototype:** an on-chain record does not by itself establish legal property ownership. Real-world use requires government integration, legal authorization, verified source documents, privacy safeguards, and compliance with applicable laws.
 
 ## Features
 
-- Administrator-controlled registrar management; registrar-only land registration and transfer decisions.
-- Unique survey numbers, parcel area and location, registration timestamp, SHA-256 document hash, and IPFS CID.
-- Searchable public land records, wallet ownership verification, and permanent ownership history.
-- Seller-created transfer requests, exact-price buyer escrow deposit, registrar approval/rejection, and valid cancellation/refunds.
-- Reentrancy guard, access checks, one active transfer per parcel, and checks-effects-interactions for escrow release.
-- Responsive dashboard, land details, ownership-history viewer, document-integrity checker, registrar tools, and transaction status feedback.
-- Browser-side AES-GCM encryption before an IPFS upload. An optional local-browser fallback stores only encrypted bytes and is suitable for a single-browser demo only.
+- Administrator and registrar roles enforced by the smart contract.
+- Land registration with unique survey number, owner address, area, location, SHA-256 document hash, and IPFS CID.
+- Property search, ownership verification, document-integrity checks, and permanent ownership history.
+- Seller-initiated transfer requests, exact-price buyer deposits, registrar decisions, and cancellable escrow credits/refunds.
+- Responsive dashboards for administration, registrars, landowners, and buyers.
+- Client-side AES-GCM document encryption before IPFS upload; a browser-local encrypted fallback for demonstrations without IPFS.
 
-## Stack and architecture
-
-- Frontend: React 18, Vite, React Router, Ethers.js, Lucide React, Recharts, custom responsive CSS.
-- Contracts: Solidity 0.8.24, Hardhat, Mocha/Chai.
-- Documents: Kubo-compatible IPFS API. The browser encrypts the file first; the contract stores a content hash and CID, never document contents.
-- There is no backend or conventional ownership database. The deployed contract is the source of record.
-
-## Repository structure
+## Project structure
 
 ```text
-contracts/LandRegistry.sol      Registry and escrow contract
-scripts/deploy.js               Local deployment and frontend ABI export
-scripts/seed.js                 Optional fictional sample records
-scripts/wait-for-chain.ps1      RPC readiness check for the Windows launcher
-scripts/capture-screenshots.js  Captures the main UI routes with Chrome or Edge
-test/LandRegistry.test.js       Contract authorization, registry, and escrow tests
-screenshots/                    Generated dashboard screenshots
-frontend/src/App.jsx             Wallet state and route shell
-frontend/src/components/         Shared registry tables, cards, and transfer UI
-frontend/src/pages/              Overview, records, registration, transfers, administration
-frontend/src/services/           Wallet, contract, and encrypted-document utilities
-frontend/src/utils/              Date, address, number, and status formatting
-frontend/src/styles.css          Responsive visual system
-frontend/src/contract.json       Frontend contract address and ABI; refreshed on deployment
-hardhat.config.js                Local Hardhat network configuration
-start.bat                        Windows one-click local demo launcher
+blockchain-land-registry/
+├── contracts/
+│   └── LandRegistry.sol                 # Land records, roles, ownership history, escrow
+├── test/
+│   └── LandRegistry.test.js             # 20 Hardhat contract tests
+├── scripts/
+│   ├── deploy.js                        # Deploy contract and export ABI/address
+│   ├── seed.js                          # Add fictional demo parcels
+│   ├── wait-for-chain.ps1               # Local RPC readiness check for Windows launcher
+│   └── capture-screenshots.js           # Capture app routes using Chrome or Edge
+├── frontend/
+│   ├── index.html                       # Vite entry point
+│   ├── package.json                     # Frontend dependencies and scripts
+│   ├── vite.config.js
+│   └── src/
+│       ├── App.jsx                      # Wallet state and route shell
+│       ├── components/RegistryUI.jsx    # Shared tables, cards, and transfer list
+│       ├── pages/
+│       │   ├── Home.jsx
+│       │   ├── Properties.jsx
+│       │   ├── Register.jsx
+│       │   ├── Transfers.jsx
+│       │   └── Administration.jsx
+│       ├── services/                    # Ethers, wallet, and document workflows
+│       ├── utils/formatters.js
+│       ├── contract.json                # Generated contract ABI and local address
+│       └── styles.css
+├── screenshots/                         # Generated UI screenshots
+├── hardhat.config.js
+├── start.bat                            # Windows one-click local demo
+├── package.json
+└── README.md
 ```
 
-## Requirements and install
+## Technology
 
-- Node.js 20+ and npm.
-- MetaMask browser extension for wallet transactions.
-- Optional: a local Kubo IPFS daemon exposing its API on loopback.
+- **Smart contract:** Solidity 0.8.24, Hardhat
+- **Frontend:** React, Vite, React Router, Ethers.js 6, Lucide React, Recharts
+- **Tests:** Hardhat, Mocha, and Chai
+- **Documents:** Kubo-compatible IPFS API with browser-side AES-GCM encryption
 
-Install both dependency sets from the repository root:
+## Requirements
+
+- Node.js 20+ and npm
+- Chrome or Edge with MetaMask for wallet transactions
+- Optional local Kubo IPFS daemon for persistent document storage
+
+Install dependencies from the repository root:
 
 ```bash
 npm install
 npm --prefix frontend install
 ```
 
-Copy `.env.example` to `frontend/.env.local` for frontend settings. The default RPC is `http://127.0.0.1:8545`; no private key or API credential is required for local development. Never commit `.env` files, private keys, wallet secrets, or API credentials.
+No private key or API credential is needed for the local demo. Never commit wallet secrets, private keys, or API credentials.
 
-## Run locally
+## Run the demo
 
-### Windows one-click startup
+### Option 1: Windows one-click startup
 
-Double-click `start.bat` from File Explorer. It installs dependencies if needed, starts or reuses the local Hardhat node, compiles and deploys the registry, seeds three fictional parcels, starts Vite, and opens `http://localhost:5173`. Keep both opened terminal windows running while using the demo. It never deploys to a public network.
+Double-click `start.bat`. It will:
 
-The script may reuse a Hardhat node that is already running. Restarting the node resets its blockchain state; run the launcher again to deploy and seed a fresh local demo.
+1. Install dependencies if they are missing.
+2. Start or reuse the local Hardhat blockchain at `http://127.0.0.1:8545`.
+3. Compile and deploy `LandRegistry.sol` locally.
+4. Seed three fictional land parcels.
+5. Start the Vite frontend and open `http://localhost:5173`.
 
-### Capture UI screenshots
+Keep the Hardhat and frontend terminal windows open while using the app. Restarting the Hardhat node resets its local blockchain state; run `start.bat` again to redeploy and seed a fresh demo.
 
-Start the local chain and frontend, deploy/seed demo data, then run `npm run capture:screenshots` from the repository root. The script uses an installed Chrome or Edge and saves four route screenshots under `screenshots/`. If the browser is installed outside the usual Windows locations, set `CHROME_PATH` to its executable path first.
+### Option 2: Manual startup
 
-### Manual startup
+From the repository root, install dependencies, then use separate terminals:
 
-Open separate terminals from the repository root.
+**Terminal 1 — start the local blockchain:**
 
-1. Compile and run contract tests:
+```bash
+npm run chain
+```
 
-   ```bash
-   npm run compile
-   npm test
-   ```
+**Terminal 2 — compile, test, deploy, and seed:**
 
-2. Start the local chain:
+```bash
+npm run compile
+npm test
+npm run deploy:local
+npm run seed:local
+```
 
-   ```bash
-   npm run chain
-   ```
+**Terminal 3 — start the frontend:**
 
-3. Deploy to the local chain in another terminal:
+```bash
+npm run dev
+```
 
-   ```bash
-   npm run deploy:local
-   ```
+Open [http://localhost:5173](http://localhost:5173). The deployment script updates `frontend/src/contract.json` with the local address and ABI. Deployment is local only; no public network is configured by default.
 
-   This writes the current contract address and ABI to `frontend/src/contract.json`. The repository includes a local-development config; deployment refreshes it. This does not deploy to a public blockchain.
+## MetaMask setup
 
-4. Optional: seed fictional example parcels:
+Add a custom network in MetaMask:
 
-   ```bash
-   npx hardhat run scripts/seed.js --network localhost
-   ```
+- **Network name:** Hardhat Local
+- **RPC URL:** `http://127.0.0.1:8545`
+- **Chain ID:** `31337`
+- **Currency symbol:** `ETH`
 
-5. Start Vite:
+The Hardhat node prints funded local test accounts and their private keys in its terminal. Import Account #0 for the administrator and use other Hardhat accounts to demonstrate registrar, owner, and buyer roles. These are publicly known test keys; use them only on the local Hardhat network and never with real funds.
 
-   ```bash
-   npm run dev
-   ```
+The deployer account is the administrator. Add a registrar wallet from the Administration page before using a separate registrar account to register land or review transfers.
 
-   Open the URL Vite prints (normally `http://localhost:5173`). Build the frontend with `npm run build`.
+## Demo workflow
 
-Hardhat prints local test account addresses and private keys in its own terminal. Import a test account into MetaMask only for this local demo and never reuse those keys on a real network. Add a network with RPC `http://127.0.0.1:8545`, chain ID `31337`, and currency symbol `ETH`. Switch accounts in MetaMask to demonstrate the administrator, registrar, owner, and buyer roles. The first deployer account is the administrator; the administrator must add the registrar account before registration or review.
+1. Connect MetaMask to Hardhat Local using the administrator account.
+2. Add a registrar wallet under **Administration**.
+3. Switch to the registrar and register a parcel with a unique survey number, owner wallet, area in m², location, and supporting PDF/JPG/PNG document.
+4. Search for the parcel under **Land records**. Inspect its current owner, document hash/CID, and ownership history; verify an owner address or document hash.
+5. Switch to the current owner and create a transfer request with the buyer address and agreed ETH price.
+6. Switch to the named buyer and enter the transfer request ID to deposit the exact agreed amount into escrow.
+7. Switch to a registrar and approve or reject the request. Approval updates ownership and credits the seller; rejection or paid cancellation credits a refund to the buyer. The recipient can withdraw the escrow credit from **Transfers**.
+8. Return to **Land records** to verify the new owner and ownership history.
 
-## Demonstration walkthrough
+## Document storage and privacy
 
-1. Connect MetaMask to Hardhat Local. The app checks chain ID 31337 and reads role permissions from the contract.
-2. As deployer, open Administration and add an authorized registrar wallet.
-3. Switch to that registrar and register land with a unique survey number, owner wallet, area (m²), location, and supporting file.
-4. The browser validates PDF/JPEG/PNG files up to 10 MB, computes SHA-256, encrypts with AES-GCM, then uploads ciphertext. Save the decryption key displayed after upload; it is not stored on-chain. If no IPFS endpoint is configured, the encrypted file is kept in the current browser's IndexedDB as a demo fallback.
-5. In Land records, search for the survey number. Inspect owner address, document hash/CID, and history. Enter an address to verify ownership. To verify file integrity, select the original unencrypted document and compare its computed hash with the on-chain hash.
-6. Switch to the current owner. In Transfers, choose the parcel, enter a buyer address and the price in ETH, then create the transfer request.
-7. Switch to the designated buyer. Enter the transfer request ID and deposit; the app reads the agreed price and submits that exact amount. The contract rejects other wallets and payment mismatches.
-8. Switch to a registrar. Review the queue and approve or reject. Approval changes ownership and credits escrow to the seller; rejection or paid cancellation credits a refund to the buyer. The recipient connects and withdraws their credit from the Transfers page.
-9. Return to Land records and inspect the updated owner and full ownership history.
+Set `VITE_IPFS_API_URL` in `frontend/.env.local` to a Kubo-compatible API base, such as `http://127.0.0.1:5001`. The browser encrypts the file before upload and records only its SHA-256 hash and CID on-chain. Save the decryption key shown after upload; the application does not store it on-chain.
 
-## IPFS configuration and privacy
+Without an IPFS endpoint, encrypted documents are kept in the current browser's IndexedDB under a local demo reference. This fallback is not replicated or accessible from another device. The app does not currently provide document decryption or key management. Do not put names, identity documents, or other sensitive personal information on-chain. Public CIDs and hashes can reveal document references and equality information even when document bytes are encrypted.
 
-Set `VITE_IPFS_API_URL` in `frontend/.env.local` to a Kubo-compatible API base, for example `http://127.0.0.1:5001`. The browser calls `/api/v0/add?pin=true` and uploads the encrypted payload. Do not expose a Pinata JWT or other provider secret in a Vite variable: frontend variables are public. For a hosted Pinata deployment, add a server-side upload proxy with authentication and rate limits, then point the frontend to that proxy. Keep decryption keys out of blockchain storage and share them only through a secure channel with authorized parties. Public CIDs and hashes reveal references and equality information even when document bytes are encrypted.
+Never put a Pinata JWT or provider secret in a Vite environment variable because frontend variables are public. For hosted Pinata use, route uploads through a secured backend proxy.
 
-The demo fallback (`local:<key>`) is stored only in the browser that uploaded it; it is not replicated or accessible from another device. Use IPFS for multi-account walkthroughs. The current UI creates an encryption key and displays it after upload, but does not provide a key-management or document-decryption workflow.
+## Capture screenshots
 
-## Contract workflow and security notes
+With the local chain and frontend running (and demo data seeded), run:
 
-The seller calls `initiateTransfer(landId, buyer, price)`. The named buyer calls `depositPayment(transferId)` with exactly the agreed wei amount. A registrar approves or rejects; a paid cancellation is available to the seller or buyer and credits a refund to the buyer. Resolution records a pull-payment credit rather than calling the recipient, avoiding recipient fallback failures from blocking review or refund. `withdrawEscrow()` clears the credit before sending ETH and has a reentrancy guard, so each credit can be withdrawn only once.
+```bash
+npm run capture:screenshots
+```
 
-The contract provides a demonstration correction operation and document update function; corrections are registrar-controlled and emit an audit event. On-chain survey numbers, addresses, locations, hashes, and CIDs are public and immutable history remains discoverable. Do not put names, identity documents, or other sensitive personal data on-chain. The contract does not establish legal title, validate government source documents, handle disputes, or integrate with cadastral authorities. A production deployment needs independent security review and jurisdiction-specific legal design.
+The script uses an installed Chrome or Edge and writes captures of the overview, land records, transfer portal, and registration portal into `screenshots/`. Set `CHROME_PATH` if the browser executable is outside the usual Windows install locations.
 
-## Optional public testnet deployment
+## Tests and build
 
-Public-network deployment is not configured or run by default. If you explicitly choose to use Sepolia, add a dedicated network configuration and use a funded testnet wallet kept outside the repository. Never add a mainnet deployment command or real funds to this local demo without an explicit decision. No transaction is sent to a public chain by the supplied scripts.
+```bash
+npm run compile
+npm test
+npm run build
+```
 
-## Common issues
+The Hardhat suite contains 20 tests covering role access, registration validation, survey lookup, ownership history, exact escrow payment, registrar decisions, cancellation/refunds, and withdrawal replay protection.
 
-- **Contract not deployed:** start the Hardhat node and run `npm run deploy:local` again.
-- **MetaMask wrong network:** choose Hardhat Local, chain ID `31337`; after restarting Hardhat, redeploy because its state resets.
-- **MetaMask not detected:** install/enable the extension and reload the Vite page.
-- **No registrar access:** connect the deployer, add a registrar under Administration, then switch to that wallet.
-- **No IPFS endpoint:** encrypted file fallback is browser-local. Configure Kubo for CID access across browsers.
-- **Upload CORS/network error:** configure the local IPFS API gateway for browser origins or use a secure backend upload proxy.
-- **Escrow amount mismatch:** the connected wallet must be the request's designated buyer; the frontend loads the exact amount from the contract.
+## Security and legal limitations
 
-## Tests
-
-`npm test` runs 20 focused cases covering administrator/registrar access, registration validation and lookup, owner indexes, exact buyer payments, approvals, cancellation/refunds, and replay/withdrawal protection. Frontend production bundle validation is `npm run build`.
+Escrow resolution uses pull-payment credits: the contract updates state and credits the recipient before `withdrawEscrow()` sends ETH. The withdrawal function clears the credit first and has a reentrancy guard. On-chain records are publicly visible and immutable; the contract does not independently establish legal title, verify government documents, resolve disputes, or integrate with cadastral authorities. This prototype is not suitable for real property transactions without legal review, government authorization, and an independent smart-contract security audit.
