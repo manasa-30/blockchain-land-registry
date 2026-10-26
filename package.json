@@ -1,0 +1,16 @@
+{
+  "name": "blockchain-land-registry",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "chain": "hardhat node",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost"
+  },
+  "devDependencies": { "hardhat": "^2.22.17", "@nomicfoundation/hardhat-toolbox": "^5.0.0", "solc": "^0.8.26" }
+}
